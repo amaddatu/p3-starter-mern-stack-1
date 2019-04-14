@@ -12,11 +12,24 @@ if (process.env.NODE_ENV === "production") {
 
 // You really only need API routes and not any HTML routes if you are using REACTJS as the frontend
 // ******************************API ROUTES INCLUDED HERE***************************** //
+app.get("/_api/non-cached", (req, res) => {
+    res.json({ random: Math.random() });
+});
+app.get("/api/cached", (req, res) => {
+    res.json({ random: Math.random() });
+});
 
 // Send every request to the React app
 // Define any API routes before this runs
+// will be broken in development...
 app.get("*", function(req, res) {
-  res.sendFile(path.join(__dirname, "./client/build/index.html"));
+  if (process.env.NODE_ENV === "production") {
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+  }
+  else{
+      // reminder
+      res.json({"message": "Go to http://localhost:3000"});
+  }
 });
 
 
