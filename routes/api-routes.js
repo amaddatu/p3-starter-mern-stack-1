@@ -13,6 +13,15 @@ module.exports = function (app, passport){
     passport.authenticate('google', { failureRedirect: '/' }),
     function(req, res) {
         // Successful authentication, redirect home.
-        res.redirect('/');
+        res.redirect(process.env.GOOGLE_CALLBACK_REDIRECT);
+    });
+
+    app.get('/_api/user', (req, res) => {
+        if(req.user){
+            res.json(req.user);
+        }
+        else{
+            res.json(false);
+        }
     });
 }
