@@ -4,6 +4,7 @@ import logo from './logo.svg';
 import './App.css';
 import AUTHAPI from './utils/google-auth';
 import PersonalAccount from './components/personal-account';
+import PrivacyPolicy from './components/privacy-policy';
 
 class App extends Component {
   state = {
@@ -20,6 +21,7 @@ class App extends Component {
     return (
       <div className="App">
         <Router>
+          <Route exact path="/privacy-policy" component={PrivacyPolicy} />
           <Route exact path="/personal-account" render={
             () => (
               <PersonalAccount {...this.props} setUser={this.setUser} user={this.state.user} />
