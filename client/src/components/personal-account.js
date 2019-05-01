@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import AUTHAPI from '../utils/google-auth';
+import { Link } from 'react-router-dom';
 
 class PersonalAccount extends Component{
     componentDidMount = () => {
@@ -12,7 +13,7 @@ class PersonalAccount extends Component{
     render() {
         return (
             <div>
-                {JSON.stringify(this.props.user)}
+                { this.props.user.email ? (`Hello, your email for future communication is set to ${this.props.user.email}`): (<p>{`Please sign in at `} <Link to="/">Homepage</Link> </p>)}
             </div>
         );
     }

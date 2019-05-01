@@ -18,7 +18,9 @@ module.exports = function (app, passport){
 
     app.get('/_api/user', (req, res) => {
         if(req.user){
-            res.json(req.user);
+            let temp = {};
+            temp.email = req.user.email;
+            res.json(temp);
         }
         else{
             res.json(false);
