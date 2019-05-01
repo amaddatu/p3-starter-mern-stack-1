@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
   // client/public is the actual folder to use for static files
 }
-let userTemporary = null;
+let userList = [];
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -35,12 +35,19 @@ function(accessToken, refreshToken, data, cb) {
   var email = data.emails[0].value;
   var google_id = data.id;
 
-  userTemporary = {
-    id: 1,
-    email: email,
-    google_id: google_id
-  };
-  return cb(null, userTemporary);
+  if(data && data.id){
+    let userTemporary = {
+      id: userList.length + 1,
+      email: email,
+      google_id: google_id
+    };
+    userList.push(userTemporary);
+    return cb(null, userTemporary);
+  }
+  else{
+    return cb(err, null);
+  }
+  
   // //try to find user
   // db.User.findOne({
   //   google_id: google_id
@@ -75,7 +82,10 @@ passport.serializeUser(function(user, done) {
 
 // when we retrieve the data from a user session
 passport.deserializeUser(function(id, done) {
-  if(id === userTemporary.id){
+  let filteredUsers = userList.filter(u => u.id === id);
+
+  let userTemporary = filteredUsers.length > 0 ? filteredUsers[0] : null;
+  if(userTemporary){
     done(null, userTemporary);
   }
   else{
