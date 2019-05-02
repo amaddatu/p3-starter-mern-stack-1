@@ -20,15 +20,32 @@ module.exports = function (app, passport){
     });
 
     app.post('/_api/user', (req, res) => {
-        console.log("Will create user soon");
-        db.User.create(req.body)
-        .then( dbUser => {
-            console.log(dbUser);
-            res.json(dbUser);
+        //try to find user
+        db.User.findOne({
+            email: req.body.email
+        })
+        .then(function(user){
+            if(!user){
+                console.log("Will create user soon");
+                db.User.create(req.body)
+                .then( dbUser => {
+                    console.log(dbUser);
+                    res.json(dbUser);
+                })
+                .catch( error => {
+                    console.log(error);
+                    res.json({"message": "Make sure that this noise does not drive me nuts!"});
+                });
+            }
+            else{
+                console.log(error);
+                res.json({"message": "Make sure that this noise does not drive me nuts!"});
+            }
+            
         })
         .catch( error => {
             console.log(error);
-            res.json({"message": "Make sure that this noise does not drive me nuts!"});
+            res.json({message: "I am so glad the noise stopped"});
         });
         
     });

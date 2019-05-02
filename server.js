@@ -7,6 +7,7 @@ const app = express();
 const passport = require("passport");
 const passportGoogleAuth = require('passport-google-oauth20');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
 
 const db = require('./models');
 
@@ -27,6 +28,39 @@ if (process.env.NODE_ENV === "production") {
   // client/public is the actual folder to use for static files
 }
 let userList = [];
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    // User.findOne({ username: username }, function (err, user) {
+    //   if (err) { return done(err); }
+    //   if (!user) { return done(null, false); }
+    //   if (!user.verifyPassword(password)) { return done(null, false); }
+    //   return done(null, user);
+    // });
+
+    //try to find user
+  db.User.findOne({
+    email: username,
+    password: password // there are better ways to verify password
+  })
+  .then(function(user){
+    if(!user){
+      // if we can't find the user... return error
+      console.log(err);
+      return done(err, null);
+    }
+    else{
+      //more magic after finding the user
+      return done(null, user);
+    }
+  })
+  .catch( err => {
+    console.log(err);
+    return done(err, null);
+  });
+  }
+))
+
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -36,45 +70,32 @@ function(accessToken, refreshToken, data, cb) {
   console.log(data);
   var email = data.emails[0].value;
   var google_id = data.id;
-
-  if(data && data.id){
-    let userTemporary = {
-      id: userList.length + 1,
-      email: email,
-      google_id: google_id
-    };
-    userList.push(userTemporary);
-    return cb(null, userTemporary);
-  }
-  else{
-    return cb(err, null);
-  }
   
-  // //try to find user
-  // db.User.findOne({
-  //   google_id: google_id
-  // })
-  // .then(function(user){
-  //   if(!user){
-  //     // SAVE USER DATA HERE
-  //     db.User.create({
-  //       email: email,
-  //       google_id: google_id
-  //     })
-  //     .then(function(user){
-  //       //more magic after creating the user
-  //       return cb(null, user);
-  //     });
-  //   }
-  //   else{
-  //     //more magic after finding the user
-  //     return cb(null, user);
-  //   }
-  // })
-  // .catch( err => {
-  //   console.log(err);
-  //   return cb(err, null);
-  // });
+  //try to find user
+  db.User.findOne({
+    google_id: google_id
+  })
+  .then(function(user){
+    if(!user){
+      // SAVE USER DATA HERE
+      db.User.create({
+        email: email,
+        google_id: google_id
+      })
+      .then(function(user){
+        //more magic after creating the user
+        return cb(null, user);
+      });
+    }
+    else{
+      //more magic after finding the user
+      return cb(null, user);
+    }
+  })
+  .catch( err => {
+    console.log(err);
+    return cb(err, null);
+  });
 }));
 
 // when we save a user to a session
@@ -84,24 +105,16 @@ passport.serializeUser(function(user, done) {
 
 // when we retrieve the data from a user session
 passport.deserializeUser(function(id, done) {
-  let filteredUsers = userList.filter(u => u.id === id);
 
-  let userTemporary = filteredUsers.length > 0 ? filteredUsers[0] : null;
-  if(userTemporary){
-    done(null, userTemporary);
-  }
-  else{
-    done(new Error('You goofed'), false);
-  }
-  // db.User.findOne({ where: {id: id }})
-  // .then(function (user) {
-  //     done(null, user);
-  // })
-  // .catch(error => {
-  //     console.log(error);
-  //     done(error, false);
-  // })
-  // ;
+  db.User.findOne({ where: {id: id }})
+  .then(function (user) {
+      done(null, user);
+  })
+  .catch(error => {
+      console.log(error);
+      done(error, false);
+  })
+  ;
 });
 
 // You really only need API routes and not any HTML routes if you are using REACTJS as the frontend
