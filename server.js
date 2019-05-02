@@ -8,6 +8,8 @@ const passport = require("passport");
 const passportGoogleAuth = require('passport-google-oauth20');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
+const db = require('./models');
+
 
 // console.log(process.env.GOOGLE_CALLBACK);
 
@@ -120,7 +122,23 @@ app.get("*", function(req, res) {
 });
 
 
+// creates all tables in production
+let syncOptions = {
+  force: process.env.NODE_ENV === 'development' ? true : false
+};
+// // skip the replacement of all tables
+// syncOptions = {
+//   force: false
+// }
 
-app.listen(PORT, function() {
-  console.log(`🌎 ==> API server now on port ${PORT}!`);
+db.sequelize.sync(syncOptions).then(function() {
+  app.listen(PORT, function() {
+    console.log(
+      "==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.",
+      PORT,
+      PORT
+    );
+  });
 });
+
+

@@ -1,4 +1,5 @@
-// const db = require('../models');
+const db = require('../models');
+// console.log(db);
 // db ???
 module.exports = function (app, passport){
     app.get("/_api/non-cached", (req, res) => {
