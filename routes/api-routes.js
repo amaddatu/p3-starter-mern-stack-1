@@ -1,3 +1,5 @@
+// const db = require('../models');
+// db ???
 module.exports = function (app, passport){
     app.get("/_api/non-cached", (req, res) => {
         res.json({ random: Math.random() });
