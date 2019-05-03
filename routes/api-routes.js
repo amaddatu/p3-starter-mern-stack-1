@@ -84,4 +84,9 @@ module.exports = function (app, passport){
             res.json(false);
         }
     });
+
+    app.get('/_api/user/logout', function(req, res){
+        req.logout();
+        res.json(true);
+    });
 }

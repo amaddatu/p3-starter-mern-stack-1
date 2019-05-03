@@ -6,6 +6,7 @@ import AUTHAPI from './utils/google-auth';
 import PersonalAccount from './components/personal-account';
 import PrivacyPolicy from './components/privacy-policy';
 import LoginLocal from './components/login-local';
+import Logout from './components/logout';
 
 class App extends Component {
   state = {
@@ -18,10 +19,21 @@ class App extends Component {
     });
   }
 
+  logout = () => {
+    AUTHAPI.getLogout().then( out => {
+      this.setState({
+        user: {}
+      })
+      window.location = '/logout';
+      // this.context.router.history.push(`/logout`);
+    })
+  }
+
   render() {
     return (
       <div className="App">
         <Router>
+          <Route exact path="/logout" component={Logout} />
           <Route exact path="/privacy-policy" component={PrivacyPolicy} />
           <Route exact path="/login-local" render={
             () => (
@@ -51,6 +63,7 @@ class App extends Component {
                 >
                   Local Login
                 </Link>
+                <button onClick={this.logout}>Logout</button>
                 <a
                   className="App-link"
                   href={AUTHAPI.getAuthorizeLink()}
