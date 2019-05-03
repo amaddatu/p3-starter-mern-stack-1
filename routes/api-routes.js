@@ -28,6 +28,7 @@ module.exports = function (app, passport){
         })
         .then(function(user){
             if(!user){
+                // if we don't have user, create
                 console.log("Will create user soon");
                 db.User.create(req.body)
                 .then( dbUser => {
@@ -40,8 +41,8 @@ module.exports = function (app, passport){
                 });
             }
             else{
-                console.log(error);
-                res.json({"message": "Make sure that this noise does not drive me nuts!"});
+                // otherwise, we have the user
+                res.json({"message": "We already have this user"});
             }
             
         })

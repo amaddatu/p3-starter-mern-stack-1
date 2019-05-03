@@ -30,13 +30,8 @@ if (process.env.NODE_ENV === "production") {
 let userList = [];
 
 passport.use(new LocalStrategy(
+  {usernameField:"email", passwordField:"password"},
   function(email, password, done) {
-    // User.findOne({ username: username }, function (err, user) {
-    //   if (err) { return done(err); }
-    //   if (!user) { return done(null, false); }
-    //   if (!user.verifyPassword(password)) { return done(null, false); }
-    //   return done(null, user);
-    // });
 
     //try to find user
   db.User.findOne({
