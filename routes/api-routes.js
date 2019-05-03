@@ -22,7 +22,9 @@ module.exports = function (app, passport){
     app.post('/_api/user', (req, res) => {
         //try to find user
         db.User.findOne({
-            email: req.body.email
+            where: {
+                email: req.body.email
+            }
         })
         .then(function(user){
             if(!user){
@@ -50,8 +52,21 @@ module.exports = function (app, passport){
         
     });
 
-    app.post('/_api/user/login', (req, res) => {
-        // we will fill this in with passport
+    app.post('/_api/user/login', 
+    passport.authenticate('local' /*, { failureRedirect: '/login' }*/),
+    function(req, res) {
+        // req.user comes from passport
+        if(req.user){
+            let temp = {};
+            // a secure way to filter your object properties
+            // only expose what you need to expose
+            temp.email = req.user.email;
+            temp.name = req.user.name;
+            res.json(temp);
+        }
+        else{
+            res.json(false);
+        }
     });
 
     app.get('/_api/user', (req, res) => {

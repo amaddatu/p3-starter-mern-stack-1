@@ -30,7 +30,7 @@ if (process.env.NODE_ENV === "production") {
 let userList = [];
 
 passport.use(new LocalStrategy(
-  function(username, password, done) {
+  function(email, password, done) {
     // User.findOne({ username: username }, function (err, user) {
     //   if (err) { return done(err); }
     //   if (!user) { return done(null, false); }
@@ -40,8 +40,10 @@ passport.use(new LocalStrategy(
 
     //try to find user
   db.User.findOne({
-    email: username,
-    password: password // there are better ways to verify password
+    where: {
+      email: email,
+      password: password // there are better ways to verify password
+    }
   })
   .then(function(user){
     if(!user){
@@ -73,7 +75,9 @@ function(accessToken, refreshToken, data, cb) {
   
   //try to find user
   db.User.findOne({
-    google_id: google_id
+    where: {
+      google_id: google_id
+    }
   })
   .then(function(user){
     if(!user){
